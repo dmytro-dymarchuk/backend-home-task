@@ -5,13 +5,15 @@ framework:
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
-            # async: '%env(MESSENGER_TRANSPORT_DSN)%'
+            async: '%env(MESSENGER_TRANSPORT_DSN)%'
             # failed: 'doctrine://default?queue_name=failed'
-            # sync: 'sync://'
+#            sync: 'in-memory://'
 
         routing:
-            # Route your messages to the transports
-            # 'App\Message\YourMessage': async
+             'App\Message\AnalyzeCommand': async
+             'App\Message\CheckStatusCommand': async
+             'App\Message\SendEmailCommand': async
+             'App\Message\SendToSlackCommand': async
 
 # when@test:
 #    framework:

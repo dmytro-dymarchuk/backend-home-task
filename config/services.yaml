@@ -4,6 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    upload_dir: '%kernel.project_dir%/var/lock_files'
+    repository_name: 'dmytro-dymarchuk/backend-home-task'
 
 services:
     # default configuration for services in *this* file
@@ -21,4 +23,35 @@ services:
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # please note that last definitions always *replace* previous
+
+    App\Service\FileSystemServiceInterface:
+        class: App\Service\FileSystemService
+        arguments:
+            $targetDirectory: '%upload_dir%'
+
+    App\Service\Debricked\DebrickedServiceInterface:
+        class: App\Service\Debricked\DebrickedService
+        arguments:
+            $token: '%env(DEBRICKED_TOKEN)%'
+            $repository: '%repository_name%'
+
+    App\Service\Rule\RuleServiceInterface:
+        class: App\Service\Rule\RuleService
+        arguments:
+            $config:
+                send_email: '%env(EMAIL_TRIGGERS)%'
+                send_to_slack: '%env(SLACK_TRIGGERS)%'
+
+    App\MessageHandler\CheckStatusCommandHandler:
+        autoconfigure: true
+        autowire: true
+        arguments:
+            $allowedVulnerabilitiesCount: '%env(ALLOWED_VULNERABILITIES_COUNT)%'
+
+    App\MessageHandler\SendEmailCommandHandler:
+        autoconfigure: true
+        autowire: true
+        arguments:
+            $email: '%env(EMAIL_TO)%'
+
