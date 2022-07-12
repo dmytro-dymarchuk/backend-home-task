@@ -90,8 +90,11 @@ services:
             - db
             - rabbitmq
             - mailhog
+            - php-asyn-worker
         entrypoint:
-            - ./docker/php/entrypoint.sh
+            - /bin/sh
+            - -c
+            - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && php-fpm --allow-to-run-as-root
         restart: on-failure
         tty: true
         user: root
@@ -119,6 +122,8 @@ services:
             - db
             - rabbitmq
             - mailhog
+        entrypoint:
+            - docker/php/entrypoint.sh
         command: "php bin/console messenger:consume async -l 100 -n"
         restart: always
         tty: true
